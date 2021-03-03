@@ -8,7 +8,11 @@
     mode: "{{ ceph_directories_mode }}"
   with_items:
     - /var/lib/ceph/bootstrap-mds/
+<<<<<<< HEAD
     - /var/lib/ceph/mds/{{ cluster }}-{{ mds_name }}
+=======
+    - /var/lib/ceph/mds/{{ cluster }}-{{ ansible_facts['hostname'] }}
+>>>>>>> a7f2fa73e... Use ansible_facts
 
 - name: get keys from monitors
   command: "{{ container_exec_cmd | default('') }} ceph --cluster {{ cluster }} auth get {{ item.name }}"

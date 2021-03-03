@@ -1,4 +1,12 @@
 ---
+<<<<<<< HEAD
+=======
+- name: fail on unsupported distribution for iscsi gateways
+  fail:
+    msg: "iSCSI gateways can only be deployed on Red Hat Enterprise Linux, CentOS or Fedora"
+  when: ansible_facts['distribution'] not in ['RedHat', 'CentOS', 'Fedora']
+
+>>>>>>> a7f2fa73e... Use ansible_facts
 - name: make sure gateway_ip_list is configured
   fail:
     msg: "you must set a list of IPs (comma separated) for gateway_ip_list"
@@ -25,6 +33,7 @@
     - item.chap
     - " '' in client_connections | selectattr('status', 'match', 'present') | map(attribute='chap') | list"
 
+<<<<<<< HEAD
 - name: check if iscsi gateways is target on supported distros and versions
   block:
     - name: fail on unsupported distribution for iscsi gateways
@@ -43,3 +52,15 @@
         - CONFIG_ISCSI_TARGET
       when: ansible_distribution in ['RedHat', 'CentOS']
   when: iscsi_gw_group_name in group_names
+=======
+- name: fail on unsupported distribution version for iscsi gateways
+  command: "grep -q {{ item }}=m {% if is_atomic|bool %}/usr/lib/ostree-boot{% else %}/boot{% endif %}/config-{{ ansible_facts['kernel'] }}"
+  register: iscsi_kernel
+  changed_when: false
+  failed_when: iscsi_kernel.rc != 0
+  loop:
+    - CONFIG_TARGET_CORE
+    - CONFIG_TCM_USER2
+    - CONFIG_ISCSI_TARGET
+  when: ansible_facts['distribution'] in ['RedHat', 'CentOS']
+>>>>>>> a7f2fa73e... Use ansible_facts

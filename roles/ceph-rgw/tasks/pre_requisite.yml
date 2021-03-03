@@ -1,12 +1,16 @@
 ---
 - name: create rgw keyrings
   ceph_key:
+<<<<<<< HEAD
     state: present
     name: "client.rgw.{{ ansible_hostname }}.{{ item.instance_name }}"
+=======
+    name: "client.rgw.{{ ansible_facts['hostname'] }}.{{ item.instance_name }}"
+>>>>>>> a7f2fa73e... Use ansible_facts
     cluster: "{{ cluster }}"
     user: "client.bootstrap-rgw"
     user_key: /var/lib/ceph/bootstrap-rgw/{{ cluster }}.keyring
-    dest: "/var/lib/ceph/radosgw/{{ cluster }}-rgw.{{ ansible_hostname }}.{{ item.instance_name }}/keyring"
+    dest: "/var/lib/ceph/radosgw/{{ cluster }}-rgw.{{ ansible_facts['hostname'] }}.{{ item.instance_name }}/keyring"
     caps:
       osd: 'allow rwx'
       mon: 'allow rw'

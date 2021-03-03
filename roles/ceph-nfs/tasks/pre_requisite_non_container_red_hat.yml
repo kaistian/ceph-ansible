@@ -16,6 +16,7 @@
 
     - name: red hat based systems - dev repo related tasks
       block:
+<<<<<<< HEAD
         - name: fetch nfs-ganesha red hat development repository
           uri:
             url: https://shaman.ceph.com/api/repos/nfs-ganesha/next/latest/{{ ansible_distribution | lower }}/{{ ansible_distribution_major_version }}/flavors/{{ nfs_ganesha_flavor }}/repo
@@ -25,6 +26,11 @@
         - name: add nfs-ganesha development repository
           copy:
             content: "{{ nfs_ganesha_dev_yum_repo.content }}"
+=======
+        - name: add nfs-ganesha dev repo
+          get_url:
+            url: "https://shaman.ceph.com/api/repos/nfs-ganesha/next/latest/{{ ansible_facts['distribution'] | lower }}/{{ ansible_facts['distribution_major_version'] }}/flavors/{{ nfs_ganesha_flavor }}/repo"
+>>>>>>> a7f2fa73e... Use ansible_facts
             dest: /etc/yum.repos.d/nfs-ganesha-dev.repo
             owner: root
             group: root

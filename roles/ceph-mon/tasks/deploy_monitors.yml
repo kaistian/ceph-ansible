@@ -1,4 +1,5 @@
 ---
+<<<<<<< HEAD
 - name: check if monitor initial keyring already exists
   ceph_key:
     name: mon.
@@ -13,6 +14,26 @@
   run_once: True
   delegate_to: "{{ running_mon }}"
   when: running_mon is defined
+=======
+- name: cephx related tasks
+  when: cephx | bool
+  block:
+    - name: check if monitor initial keyring already exists
+      ceph_key:
+        name: mon.
+        cluster: "{{ cluster }}"
+        user: mon.
+        user_key: "/var/lib/ceph/mon/{{ cluster }}-{{ hostvars[running_mon]['ansible_facts']['hostname'] }}/keyring"
+        output_format: json
+        state: info
+      environment:
+        CEPH_CONTAINER_IMAGE: "{{ ceph_docker_registry + '/' + ceph_docker_image + ':' + ceph_docker_image_tag if containerized_deployment | bool else None }}"
+        CEPH_CONTAINER_BINARY: "{{ container_binary }}"
+      register: initial_mon_key
+      run_once: True
+      delegate_to: "{{ running_mon }}"
+      when: running_mon is defined
+>>>>>>> a7f2fa73e... Use ansible_facts
 
 - name: generate monitor initial keyring
   ceph_key:
