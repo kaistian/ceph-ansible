@@ -1,6 +1,6 @@
 - name: set grafana_server_addr fact - ipv4
   set_fact:
-    grafana_server_addr: "{{ hostvars[inventory_hostname]['ansible_all_ipv4_addresses'] | ips_in_ranges(public_network.split(',')) | first }}"
+    grafana_server_addr: "{{ hostvars[inventory_hostname]['ansible_facts']['all_ipv4_addresses'] | ips_in_ranges(public_network.split(',')) | first }}"
   when:
     - groups.get(grafana_server_group_name, []) | length > 0
     - ip_version == 'ipv4'
@@ -9,7 +9,7 @@
 
 - name: set grafana_server_addr fact - ipv6
   set_fact:
-    grafana_server_addr: "{{ hostvars[inventory_hostname]['ansible_all_ipv6_addresses'] | ips_in_ranges(public_network.split(',')) | last | ipwrap }}"
+    grafana_server_addr: "{{ hostvars[inventory_hostname]['ansible_facts']['all_ipv6_addresses'] | ips_in_ranges(public_network.split(',')) | last | ipwrap }}"
   when:
     - groups.get(grafana_server_group_name, []) | length > 0
     - ip_version == 'ipv6'
@@ -18,8 +18,13 @@
 
 - name: set grafana_server_addrs fact - ipv4
   set_fact:
+<<<<<<< HEAD
     grafana_server_addrs: "{{ (grafana_server_addrs | default([]) + [hostvars[item]['ansible_all_ipv4_addresses'] | ips_in_ranges(public_network.split(',')) | first]) | unique }}"
   with_items: "{{ groups.get(grafana_server_group_name, []) }}"
+=======
+    grafana_server_addrs: "{{ (grafana_server_addrs | default([]) + [hostvars[item]['ansible_facts']['all_ipv4_addresses'] | ips_in_ranges(public_network.split(',')) | first]) | unique }}"
+  with_items: "{{ groups.get(monitoring_group_name, []) }}"
+>>>>>>> a7f2fa73e... Use ansible_facts
   when:
     - groups.get(grafana_server_group_name, []) | length > 0
     - ip_version == 'ipv4'
@@ -27,8 +32,13 @@
 
 - name: set grafana_server_addrs fact - ipv6
   set_fact:
+<<<<<<< HEAD
     grafana_server_addrs: "{{ (grafana_server_addrs | default([]) + [hostvars[item]['ansible_all_ipv6_addresses'] | ips_in_ranges(public_network.split(',')) | last | ipwrap]) | unique }}"
   with_items: "{{ groups.get(grafana_server_group_name, []) }}"
+=======
+    grafana_server_addrs: "{{ (grafana_server_addrs | default([]) + [hostvars[item]['ansible_facts']['all_ipv6_addresses'] | ips_in_ranges(public_network.split(',')) | last | ipwrap]) | unique }}"
+  with_items: "{{ groups.get(monitoring_group_name, []) }}"
+>>>>>>> a7f2fa73e... Use ansible_facts
   when:
     - groups.get(grafana_server_group_name, []) | length > 0
     - ip_version == 'ipv6'

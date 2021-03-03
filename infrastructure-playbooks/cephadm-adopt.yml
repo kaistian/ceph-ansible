@@ -256,12 +256,20 @@
           delegate_to: '{{ groups[mon_group_name][0] }}'
 
     - name: manage nodes with cephadm
+<<<<<<< HEAD
       command: "{{ container_exec_cmd | default('') }} ceph --cluster {{ cluster }} orch host add {{ ansible_hostname }} {{ ansible_default_ipv4.address }} {{ group_names | join(' ') }}"
+=======
+      command: "{{ ceph_cmd }} orch host add {{ ansible_facts['hostname'] }} {{ ansible_facts['default_ipv4']['address'] }} {{ group_names | join(' ') }}"
+>>>>>>> a7f2fa73e... Use ansible_facts
       changed_when: false
       delegate_to: '{{ groups[mon_group_name][0] }}'
 
     - name: add ceph label for core component
+<<<<<<< HEAD
       command: "{{ container_exec_cmd | default('') }} ceph --cluster {{ cluster }} orch host label add {{ ansible_hostname }} ceph"
+=======
+      command: "{{ ceph_cmd }} orch host label add {{ ansible_facts['hostname'] }} ceph"
+>>>>>>> a7f2fa73e... Use ansible_facts
       changed_when: false
       delegate_to: '{{ groups[mon_group_name][0] }}'
       when: inventory_hostname in groups.get(mon_group_name, []) or
@@ -323,7 +331,7 @@
 
     - name: adopt mon daemon
       cephadm_adopt:
-        name: "mon.{{ ansible_hostname }}"
+        name: "mon.{{ ansible_facts['hostname'] }}"
         cluster: "{{ cluster }}"
         image: "{{ ceph_docker_registry }}/{{ ceph_docker_image }}:{{ ceph_docker_image_tag }}"
         docker: "{{ true if container_binary == 'docker' else false }}"
@@ -331,7 +339,7 @@
         firewalld: "{{ true if configure_firewall | bool else false }}"
 
     - name: reset failed ceph-mon systemd unit
-      command: 'systemctl reset-failed ceph-mon@{{ ansible_hostname }}'  # noqa 303
+      command: "systemctl reset-failed ceph-mon@{{ ansible_facts['hostname'] }}"  # noqa 303
       changed_when: false
       failed_when: false
       when: containerized_deployment | bool
@@ -353,7 +361,7 @@
       changed_when: false
       register: ceph_health_raw
       until: >
-        ansible_hostname in (ceph_health_raw.stdout | from_json)["quorum_names"]
+        ansible_facts['hostname'] in (ceph_health_raw.stdout | from_json)["quorum_names"]
       retries: "{{ health_mon_check_retries }}"
       delay: "{{ health_mon_check_delay }}"
       environment:
@@ -370,7 +378,7 @@
 
     - name: adopt mgr daemon
       cephadm_adopt:
-        name: "mgr.{{ ansible_hostname }}"
+        name: "mgr.{{ ansible_facts['hostname'] }}"
         cluster: "{{ cluster }}"
         image: "{{ ceph_docker_registry }}/{{ ceph_docker_image }}:{{ ceph_docker_image_tag }}"
         docker: "{{ true if container_binary == 'docker' else false }}"
@@ -378,7 +386,7 @@
         firewalld: "{{ true if configure_firewall | bool else false }}"
 
     - name: reset failed ceph-mgr systemd unit
-      command: 'systemctl reset-failed ceph-mgr@{{ ansible_hostname }}'  # noqa 303
+      command: "systemctl reset-failed ceph-mgr@{{ ansible_facts['hostname'] }}"  # noqa 303
       changed_when: false
       failed_when: false
       when: containerized_deployment | bool
@@ -538,7 +546,7 @@
 
     - name: stop and disable ceph-mds systemd service
       service:
-        name: 'ceph-mds@{{ ansible_hostname }}'
+        name: "ceph-mds@{{ ansible_facts['hostname'] }}"
         state: stopped
         enabled: false
 
@@ -550,7 +558,7 @@
       when: not containerized_deployment | bool
 
     - name: reset failed ceph-mds systemd unit
-      command: 'systemctl reset-failed ceph-mds@{{ ansible_hostname }}'  # noqa 303
+      command: "systemctl reset-failed ceph-mds@{{ ansible_facts['hostname'] }}"  # noqa 303
       changed_when: false
       failed_when: false
       when: containerized_deployment | bool
@@ -569,7 +577,7 @@
 
     - name: remove legacy ceph mds data
       file:
-        path: '/var/lib/ceph/mds/{{ cluster }}-{{ ansible_hostname }}'
+        path: "/var/lib/ceph/mds/{{ cluster }}-{{ ansible_facts['hostname'] }}"
         state: absent
 
 - name: rgw realm/zonegroup/zone requirements
@@ -636,7 +644,7 @@
 
     - name: stop and disable ceph-radosgw systemd service
       service:
-        name: 'ceph-radosgw@rgw.{{ ansible_hostname }}.{{ item.instance_name }}'
+        name: "ceph-radosgw@rgw.{{ ansible_facts['hostname'] }}.{{ item.instance_name }}"
         state: stopped
         enabled: false
       loop: '{{ rgw_instances }}'
@@ -649,7 +657,7 @@
       when: not containerized_deployment | bool
 
     - name: reset failed ceph-radosgw systemd unit
-      command: 'systemctl reset-failed ceph-radosgw@rgw.{{ ansible_hostname }}.{{ item.instance_name }}'  # noqa 303
+      command: "systemctl reset-failed ceph-radosgw@rgw.{{ ansible_facts['hostname'] }}.{{ item.instance_name }}"  # noqa 303
       changed_when: false
       failed_when: false
       loop: '{{ rgw_instances }}'
@@ -669,13 +677,13 @@
 
     - name: remove legacy ceph radosgw data
       file:
-        path: '/var/lib/ceph/radosgw/{{ cluster }}-rgw.{{ ansible_hostname }}.{{ item.instance_name }}'
+        path: "/var/lib/ceph/radosgw/{{ cluster }}-rgw.{{ ansible_facts['hostname'] }}.{{ item.instance_name }}"
         state: absent
       loop: '{{ rgw_instances }}'
 
     - name: remove legacy ceph radosgw directory
       file:
-        path: '/var/lib/ceph/radosgw/{{ cluster }}-rgw.{{ ansible_hostname }}'
+        path: "/var/lib/ceph/radosgw/{{ cluster }}-rgw.{{ ansible_facts['hostname'] }}"
         state: absent
 
 - name: redeploy rbd-mirror daemons
@@ -705,7 +713,7 @@
 
     - name: stop and disable rbd-mirror systemd service
       service:
-        name: 'ceph-rbd-mirror@rbd-mirror.{{ ansible_hostname }}'
+        name: "ceph-rbd-mirror@rbd-mirror.{{ ansible_facts['hostname'] }}"
         state: stopped
         enabled: false
 
@@ -717,7 +725,7 @@
       when: not containerized_deployment | bool
 
     - name: reset failed rbd-mirror systemd unit
-      command: 'systemctl reset-failed ceph-rbd-mirror@rbd-mirror.{{ ansible_hostname }}'  # noqa 303
+      command: "systemctl reset-failed ceph-rbd-mirror@rbd-mirror.{{ ansible_facts['hostname'] }}"  # noqa 303
       changed_when: false
       failed_when: false
       when: containerized_deployment | bool
@@ -854,7 +862,7 @@
 
         - name: adopt alertmanager daemon
           cephadm_adopt:
-            name: "alertmanager.{{ ansible_hostname }}"
+            name: "alertmanager.{{ ansible_facts['hostname'] }}"
             cluster: "{{ cluster }}"
             image: "{{ alertmanager_container_image }}"
             docker: "{{ true if container_binary == 'docker' else false }}"
@@ -916,7 +924,7 @@
 
         - name: adopt prometheus daemon
           cephadm_adopt:
-            name: "prometheus.{{ ansible_hostname }}"
+            name: "prometheus.{{ ansible_facts['hostname'] }}"
             cluster: "{{ cluster }}"
             image: "{{ prometheus_container_image }}"
             docker: "{{ true if container_binary == 'docker' else false }}"
@@ -942,7 +950,7 @@
 
         - name: adopt grafana daemon
           cephadm_adopt:
-            name: "grafana.{{ ansible_hostname }}"
+            name: "grafana.{{ ansible_facts['hostname'] }}"
             cluster: "{{ cluster }}"
             image: "{{ grafana_container_image }}"
             docker: "{{ true if container_binary == 'docker' else false }}"

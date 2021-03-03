@@ -7,7 +7,12 @@
         name: mon.
         cluster: "{{ cluster }}"
         user: mon.
+<<<<<<< HEAD
         user_key: "/var/lib/ceph/mon/{{ cluster }}-{{ hostvars[running_mon]['ansible_hostname'] }}/keyring"
+=======
+        user_key: "/var/lib/ceph/mon/{{ cluster }}-{{ hostvars[running_mon]['ansible_facts']['hostname'] }}/keyring"
+        output_format: json
+>>>>>>> a7f2fa73e... Use ansible_facts
         state: info
       environment:
         CEPH_CONTAINER_IMAGE: "{{ ceph_docker_registry + '/' + ceph_docker_image + ':' + ceph_docker_image_tag if containerized_deployment | bool else None }}"
