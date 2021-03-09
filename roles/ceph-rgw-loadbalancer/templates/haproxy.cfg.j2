@@ -48,6 +48,10 @@ frontend rgw-frontend
 # Practically speaking, it would be preferable (and perhaps easier) to configure the
 # rgw daemons to listen on ports 10001-10010 and configure haproxy here to match.
 #
+# Alternatively you can add other unused ports to http_port_t or http_cache_port_t
+# with, e.g.: `semanage port -a -t http_cache_port_t -p tcp 8085`
+# (Note that ports 8081-8084 are already taken and can't be used for haproxy.)
+#
 backend rgw-backend
     option forwardfor
     balance static-rr
